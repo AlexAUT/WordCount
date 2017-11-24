@@ -2,7 +2,10 @@
 #include <iomanip>
 #include <vector>
 
-#include "wordCounter.hpp"
+#include <fstream>
+
+#include "countWorkerSystem.hpp"
+
 
 std::vector<std::string> parseCommandLineArguments(int argc, const char** argv)
 {
@@ -20,7 +23,25 @@ std::vector<std::string> parseCommandLineArguments(int argc, const char** argv)
   return filePaths;
 }
 
-void printResults(WordCounter::WordCountMap wordCounts)
+void processFile(const std::string& fileName, CountWorkerSystem& countSystem)
+{
+  std::fstream file(fileName.c_str(), std::ios::in);
+
+  if(!file.is_open())
+  {
+    std::cout << "Could not open file: " << fileName << std::endl;
+    return;
+  }
+
+  //Read file line by line
+  std::string line;
+  while(std::getline(file, line))
+  {
+    countSystem.addJob(line);
+  }
+}
+
+void printResults(CountWorkerSystem::WordCountMap wordCounts)
 {
   //Find longest word
   std::size_t maxLength = 0;
@@ -46,26 +67,19 @@ int main(int argc, const char** argv)
   if(filePaths.empty())
     return -1;
 
-
-  std::vector<WordCounter> wordCounters;
-  //Create for every file a word counter
+  CountWorkerSystem countSystem;
+  using namespace std::chrono_literals;
+  std::this_thread::sleep_for(1s);
   for(auto& filePath : filePaths)
-    wordCounters.emplace_back(filePath);
-  //Start processing each file
-  for(auto& wordCounter : wordCounters)
-    wordCounter.processFile();
-
-  //Join results of all files
-  WordCounter::WordCountMap completeMap;
-  for(auto& wordCounter : wordCounters)
   {
-    auto map = wordCounter.getWordCountMap();
-    for(auto& word : map)
-      completeMap[word.first] = completeMap[word.first] + word.second;
+    processFile(filePath, countSystem);
   }
 
+  //This is a blocking call, will stop workers (after all jobs are completed)
+  countSystem.stop();
+
   //Print results
-  printResults(completeMap);
+  printResults(countSystem.getWordCountMap());
 
   return 0;
 }
