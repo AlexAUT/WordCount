@@ -6,6 +6,8 @@
 
 #include "countWorkerSystem.hpp"
 
+const unsigned NUMBER_OF_WORKERS = 10;
+
 
 std::vector<std::string> parseCommandLineArguments(int argc, const char** argv)
 {
@@ -67,7 +69,7 @@ int main(int argc, const char** argv)
   if(filePaths.empty())
     return -1;
 
-  CountWorkerSystem countSystem;
+  CountWorkerSystem countSystem(NUMBER_OF_WORKERS);
   using namespace std::chrono_literals;
   std::this_thread::sleep_for(1s);
   for(auto& filePath : filePaths)
