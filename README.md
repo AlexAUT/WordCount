@@ -6,4 +6,5 @@ Small multithreaded version for counting word frequency in multiple input files
 
 ## building
 `cmake .`
+
 `make`
