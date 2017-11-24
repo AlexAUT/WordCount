@@ -29,10 +29,9 @@ void WordCounter::processFile()
       std::string word;
       while(std::getline(lineStream, word, ' '))
       {
-        std::cout << "Found word: " << word << std::endl;
         mWordCountMap[word] = mWordCountMap[word] + 1;
       }
-      //Fater version but a bit more ugly
+      //Faster version but a bit more ugly
 //      std::size_t wordStart = 0;
 //      std::size_t wordEnd = line.find(' ');
 //      // Save tokens

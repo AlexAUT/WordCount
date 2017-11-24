@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 #include "wordCounter.hpp"
@@ -19,6 +20,25 @@ std::vector<std::string> parseCommandLineArguments(int argc, const char** argv)
   return filePaths;
 }
 
+void printResults(WordCounter::WordCountMap wordCounts)
+{
+  //Find longest word
+  std::size_t maxLength = 0;
+  for(auto& word : wordCounts)
+    maxLength = std::max(maxLength, word.first.size());
+
+  //Format helpers
+  using std::left;
+  using std::right;
+  auto cell1Format = std::setw(static_cast<int>(maxLength));
+  auto cell2Format = std::setw(10);
+  //Print
+  std::cout << left << cell1Format << "Wort" << right << cell2Format << "Anzahl" << std::endl;
+  for(auto &entry : wordCounts)
+    std::cout << left << cell1Format << entry.first << right << cell2Format << entry.second << std::endl;
+
+}
+
 int main(int argc, const char** argv)
 {
   auto filePaths = parseCommandLineArguments(argc, argv);
@@ -28,13 +48,14 @@ int main(int argc, const char** argv)
 
 
   std::vector<WordCounter> wordCounters;
+  //Create for every file a word counter
   for(auto& filePath : filePaths)
     wordCounters.emplace_back(filePath);
-
+  //Start processing each file
   for(auto& wordCounter : wordCounters)
     wordCounter.processFile();
 
-
+  //Join results of all files
   WordCounter::WordCountMap completeMap;
   for(auto& wordCounter : wordCounters)
   {
@@ -43,8 +64,8 @@ int main(int argc, const char** argv)
       completeMap[word.first] = completeMap[word.first] + word.second;
   }
 
-  for(auto &entry : completeMap)
-    std::cout << entry.first << " -> " << entry.second << std::endl;
+  //Print results
+  printResults(completeMap);
 
   return 0;
 }
