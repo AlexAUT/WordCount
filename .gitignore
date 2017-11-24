@@ -98,3 +98,7 @@ Thumbs.db
 .idea/*
 cmake-build-debug/*
 CMakeLists.txt.user
+
+#Exercise
+recruiting-exercise-cpp.txt
+sample.txt
